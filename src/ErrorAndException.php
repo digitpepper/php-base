@@ -12,21 +12,29 @@ class ErrorAndException
 {
 	public static function error_handler(int $errno, string $errstr, string $errfile, int $errline): void
 	{
-		\http_response_code(500);
-		$message = \sprintf("<br />\r\n<b>%s</b>: %s in <b>%s</b> on line <b>%s</b><br />",
+		$response_code = 500;
+		$message = \sprintf(
+			"<br />\r\n<b>%s</b>: %s in <b>%s</b> on line <b>%s</b><br />",
 			Util::h(self::get_friendly_error_type($errno)),
 			Util::h($errstr),
 			Util::h($errfile),
 			Util::h((string)$errline)
 		);
+		$filename = \pathinfo($errfile, \PATHINFO_FILENAME);
+		$line = \str_pad((string)$errline, 6, '0', \STR_PAD_LEFT);
+		$code = "$filename-$line";
+		\error_log(\trim(\strip_tags($message)));
+		if (\error_reporting() === 0) {
+			$message = 'An error was encountered.';
+			$code = 'error';
+		}
 		if (Util::is_ajax()) {
-			$filename = \pathinfo($errfile, \PATHINFO_FILENAME);
-			$line = \str_pad((string)$errline, 6, '0', \STR_PAD_LEFT);
 			Util::send_json_error([
 				'message' => \trim(\strip_tags($message)),
-			], "$filename-$line", \JSON_PRETTY_PRINT);
+			], $code, \JSON_PRETTY_PRINT, $response_code);
 		}
-		header('Content-Type: text/html; charset=UTF-8');
+		\http_response_code($response_code);
+		\header('Content-Type: text/html; charset=UTF-8');
 		echo $message;
 		exit;
 	}
