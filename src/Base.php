@@ -4,15 +4,13 @@ declare(strict_types = 1);
 
 namespace DP;
 
-use DP\ErrorAndException;
-
 class Base
 {
 	public static function init(): void
 	{
+		\ob_start();
 		self::register_autoload();
 		self::set_error_handler();
-		self::set_exception_handler();
 		self::register_shutdown_function();
 	}
 
@@ -35,12 +33,7 @@ class Base
 
 	public static function set_error_handler(): void
 	{
-		\set_error_handler([ErrorAndException::class, 'error_handler']);
-	}
-
-	public static function set_exception_handler(): void
-	{
-		\set_exception_handler([ErrorAndException::class, 'exception_handler']);
+		\set_error_handler([ErrorAndException::class, 'error_handler'], \error_reporting());
 	}
 
 	public static function register_shutdown_function(): void

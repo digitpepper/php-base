@@ -58,7 +58,9 @@ class Util
 	public static function send_json_error(array $data, string $code = null, int $flags = 0, int $response_code = 400): void
 	{
 		if ($code === null) {
-			list($file, $line) = \array_values(\debug_backtrace()[0]);
+			$values = \array_values(\debug_backtrace()[0]);
+			$file = $values[0];
+			$line = $values[1] ?? '';
 			$filename = \pathinfo($file, PATHINFO_FILENAME);
 			$line = \str_pad((string)$line, 6, '0', STR_PAD_LEFT);
 			$code = "$filename-$line";
@@ -77,7 +79,7 @@ class Util
 	}
 
 	/**
-	 * @param array<mixed> ...$string
+	 * @param array <mixed> ...$string
 	 * @return mixed
 	 */
 	public static function t(...$string)
