@@ -20,8 +20,9 @@ class Base
 			$names = \explode('_', $class);
 			$dir = \count($names) > 1 ? '/' . \strtolower(\array_pop($names)) . 's' : '/classes';
 			$dirname = \dirname($_SERVER['SCRIPT_FILENAME']);
-			if (\is_file("$dirname/protected$dir/$class.php")) {
-				require "$dirname/protected$dir/$class.php";
+			$_class = str_replace('\\', DIRECTORY_SEPARATOR, $class);
+			if (\is_file("$dirname/protected$dir/$_class.php")) {
+				require "$dirname/protected$dir/$_class.php";
 			}
 
 			// https://stackoverflow.com/a/20767037/1916294
